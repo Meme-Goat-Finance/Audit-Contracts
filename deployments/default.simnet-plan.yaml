@@ -1,0 +1,186 @@
+---
+id: 0
+name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
+network: simnet
+genesis:
+  wallets:
+    - name: deployer
+      address: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+      balance: "100000000000000"
+    - name: faucet
+      address: STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6
+      balance: "100000000000000"
+    - name: wallet_1
+      address: ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+      balance: "100000000000000"
+    - name: wallet_2
+      address: ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG
+      balance: "100000000000000"
+    - name: wallet_3
+      address: ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC
+      balance: "100000000000000"
+    - name: wallet_4
+      address: ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND
+      balance: "100000000000000"
+    - name: wallet_5
+      address: ST2REHHS5J3CERCRBEPMGH7921Q6PYKAADT7JP2VB
+      balance: "100000000000000"
+    - name: wallet_6
+      address: ST3AM1A56AK2C1XAFJ4115ZSV26EB49BVQ10MGCS0
+      balance: "100000000000000"
+    - name: wallet_7
+      address: ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ
+      balance: "100000000000000"
+    - name: wallet_8
+      address: ST3NBRSFKX28FQ2ZJ1MAKX58HKHSDGNV5N7R21XCP
+      balance: "100000000000000"
+  contracts:
+    - costs
+    - pox
+    - pox-2
+    - pox-3
+    - pox-4
+    - lockup
+    - costs-2
+    - costs-3
+    - cost-voting
+    - bns
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - emulated-contract-publish:
+            contract-name: sip-010-trait-ft-standard
+            emulated-sender: SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE
+            path: "./.cache/requirements/SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.clar"
+            clarity-version: 1
+      epoch: "2.0"
+    - id: 1
+      transactions:
+        - emulated-contract-publish:
+            contract-name: sip-010-trait-ft-standard
+            emulated-sender: SP2AKWJYC7BNY18W1XXKPGP0YVEK63QJG4793Z2D4
+            path: "./.cache/requirements/SP2AKWJYC7BNY18W1XXKPGP0YVEK63QJG4793Z2D4.sip-010-trait-ft-standard.clar"
+            clarity-version: 1
+        - emulated-contract-publish:
+            contract-name: trait-sip-010
+            emulated-sender: SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9
+            path: "./.cache/requirements/SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.trait-sip-010.clar"
+            clarity-version: 1
+      epoch: "2.05"
+    - id: 2
+      transactions:
+        - emulated-contract-publish:
+            contract-name: ft-plus-trait
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.ft-plus-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: univ2-share-fee-to-trait
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-share-fee-to-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: univ2-core
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-core.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: univ2-library
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-library.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: univ2-router
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-router.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: univ2-share-fee-to
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-share-fee-to.clar"
+            clarity-version: 2
+      epoch: "2.4"
+    - id: 3
+      transactions:
+        - emulated-contract-publish:
+            contract-name: extension-trait
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.extension-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: proposal-trait
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.proposal-trait.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: executor-dao
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.executor-dao.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: trait-sip-010
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.trait-sip-010.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: amm-registry-v2-01
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-registry-v2-01.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: trait-flash-loan-user
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.trait-flash-loan-user.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: trait-semi-fungible
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.trait-semi-fungible.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: amm-vault-v2-01
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-vault-v2-01.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: token-amm-pool-v2-01
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-amm-pool-v2-01.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: amm-pool-v2-01
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-pool-v2-01.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: self-listing-helper-v2-01
+            emulated-sender: SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM
+            path: "./.cache/requirements/SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.self-listing-helper-v2-01.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: univ2-path2
+            emulated-sender: SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1
+            path: "./.cache/requirements/SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-path2.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: memegoat-launchpad-vault
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/vault-v1-2.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: memegoat-launchpad
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/memegoat-launchpad.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: memegoat-stakepool-vault-v1
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/vault-v1-2.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: memegoat-stake-pool
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/memegoat-stake-pool.clar
+            clarity-version: 2
+      epoch: "2.5"
