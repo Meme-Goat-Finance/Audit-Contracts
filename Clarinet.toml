@@ -1,0 +1,63 @@
+[project]
+name = "audit"
+description = ""
+authors = []
+telemetry = true
+cache_dir = "./.cache"
+
+[[project.requirements]]
+contract_id = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard'
+
+[[project.requirements]]
+contract_id = 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.trait-sip-010'
+
+[[project.requirements]]
+contract_id = 'SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-path2'
+
+[[project.requirements]]
+contract_id = 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.amm-pool-v2-01'
+
+[[project.requirements]]
+contract_id = 'SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-share-fee-to'
+
+[[project.requirements]]
+contract_id = 'SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.univ2-router'
+
+[[project.requirements]]
+contract_id = 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.trait-sip-010'
+
+[[project.requirements]]
+contract_id = 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.self-listing-helper-v2-01'
+
+[repl.analysis]
+passes = ["check_checker"]
+check_checker = { trusted_sender = false, trusted_caller = false, callee_filter = false }
+
+
+[contracts.memegoat-launchpad]
+path = 'contracts/memegoat-launchpad.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.memegoat-launchpad-vault]
+path = 'contracts/vault-v1-2.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.memegoat-stake-pool]
+path = 'contracts/memegoat-stake-pool.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.memegoat-stakepool-vault-v1]
+path = 'contracts/vault-v1-2.clar'
+clarity_version = 2
+epoch = 2.5
+
+# Check-checker settings:
+# trusted_sender: if true, inputs are trusted after tx_sender has been checked.
+# trusted_caller: if true, inputs are trusted after contract-caller has been checked.
+# callee_filter: if true, untrusted data may be passed into a private function without a
+# warning, if it gets checked inside. This check will also propagate up to the
+# caller.
+# More informations: https://www.hiro.so/blog/new-safety-checks-in-clarinet
