@@ -31,7 +31,9 @@
 (define-constant ERR-BELOW-MINIMUM-CAMPAIGN-ALLOCATION (err u9002))
 (define-constant ERR-NO-CAMPAIGN-ALLOCATION (err u9003))
 (define-constant ERR-REWARDS-NOT-SET (err u9004))
-(define-constant ERR-INVALID-EXCHANGE (err u9004))
+(define-constant ERR-INVALID-EXCHANGE (err u9005))
+(define-constant ERR-TOKEN-ALREADY-LISTED (err u9006))
+(define-constant ERR-INVALID-BLOCK-TIMES (err u9007))
 
 
 ;; DATA MAPS AND VARS
@@ -488,6 +490,7 @@
     (asserts! (> pool-amount u0) ERR-ZERO-AMOUNT)
     (asserts! (and (> min-stx-deposit u0) (> max-stx-deposit u0)) ERR-ZERO-AMOUNT)
     (asserts! (or (is-eq exchange-id VELAR) (is-eq  exchange-id ALEX)) ERR-INVALID-EXCHANGE)
+    (asserts! (and (> block-height start-block) (> end-block start-block)) ERR-INVALID-BLOCK-TIMES)
 
     (let
       (
@@ -499,8 +502,10 @@
         (total-to-send (+ pool-amount listing-allocation campaign-amount))
         (duration (- end-block start-block))
         (next-launchpad-id (+ (var-get launchpad-nonce) u1))
+        (token-exist (map-get? launchpad-map-by-token-addr {token-addr: (contract-of token)}))
       )
-
+      
+      (asserts! (is-none token-exist) ERR-TOKEN-ALREADY-LISTED)
       (asserts! (>= pool-amount min-pool-amount ) ERR-BELOW-MINIMUM-POOL-ALLOCATION)
       (asserts! (>= listing-allocation min-listing-allocation ) ERR-BELOW-MINIMUM-LISTING-ALLOCATION)
       (asserts! (>= duration u144) ERR-BELOW-MIN-PERIOD) ;; rough estimate of one day
