@@ -1,7 +1,7 @@
 ;;
 ;;  MEMEGOAT STAKING POOL CONTRACT
 ;;
-
+(impl-trait .extension-trait.extension-trait)
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; ERRS
@@ -15,15 +15,14 @@
 (define-constant ERR-INVALID-REWARD-PER-BLOCK (err u3003))
 (define-constant ERR-NO-STAKE-FOUND (err u3004))
 (define-constant ERR-STAKE-ENDED (err u4000))
+(define-constant ERR-POOL-NOT-VERIFIED (err u4001))
 
 ;; DATA MAPS AND VARS
-(define-data-var contract-owner principal tx-sender)
 (define-data-var paused bool false)
 (define-data-var stake-nonce uint u0)
 (define-data-var pool-fee uint u2000000)
 
 (define-constant PRECISION (pow u10 u9))
-(define-constant OLD-PRECISION (pow u10 u18))
 
 ;; @desc map to store stake pool data
 (define-map stake-pool-map
@@ -125,127 +124,56 @@
   (var-get pool-fee)
 )
 
-;; MANAGEMENT CALLS
-
-;; @desc set-contract-owner: sets owner
-;; @requirement only callable by current owner
-;; @params owner
-;; @returns (response boolean)
-(define-public (set-contract-owner (owner principal))
-  (begin
-    (try! (check-is-owner)) 
-    (ok (var-set contract-owner owner))
-  )
+(define-read-only (is-dao-or-extension)
+	(ok (asserts! (or (is-eq tx-sender .memegoat-community-dao) (contract-call? .memegoat-community-dao is-extension contract-caller)) ERR-NOT-AUTHORIZED))
 )
 
+;; MANAGEMENT CALLS
+
 ;; @desc pause: updates contracts paused state
-;; @requirement only callable by current owner
+;; @requirement only callable by dao
 ;; @params new-paused
 ;; @returns (response boolean)
 (define-public (pause (new-paused bool))
   (begin 
-    (try! (check-is-owner))
+    (try! (is-dao-or-extension))
     (ok (var-set paused new-paused))
   )
 )
 
 ;; @desc set-pool-fee: updates fee for creating pool
-;; @requirement only callable by current owner
+;; @requirement only callable by dao
 ;; @params amount
 ;; @returns (response boolean)
 (define-public (set-fee (amount uint)) 
   (begin 
-    (try! (check-is-owner))
+    (try! (is-dao-or-extension))
     (asserts! (> amount u0) ERR-ZERO-AMOUNT)
     (ok (var-set pool-fee amount))
   )
 )
 
-;; @desc verify-pool: verify pool as original
-;; @requirement only callable by current owner
+;; @desc set-approval-status: verify pool as original
+;; @requirement only callable by dao
 ;; @params status
 ;; @returns (response boolean)
-(define-public (verify-pool (stake-id uint) (status bool)) 
+(define-public (set-approval-status (token-trait principal) (id uint) (status bool))
   (begin 
-    (try! (check-is-owner))
+    (try! (is-dao-or-extension))
     (let 
       (
-        (stake-pool (try! (get-stake-pool stake-id)))
+        (stake-pool (try! (get-stake-pool id)))
         (updated-stake-pool (merge stake-pool {
           verified: status
         }))
       )
       ;; update stake pool
-      (map-set stake-pool-map {stake-id: stake-id} updated-stake-pool)
+      (map-set stake-pool-map {stake-id: id} updated-stake-pool)
     )
     (ok true)
   )
 )
 
-;; @desc port-pools: move pools
-;; (define-public (move-pool (stake-id uint))
-;;   (begin 
-;;     (try! (check-is-owner))
-;;     (let
-;;       (
-;;         (next-stake-id (get-next-stake-id))
-;;         (stake-pool (try! (contract-call? .memegoat-stake-pool-v1 get-stake-pool stake-id)))
-;;       )
-;;       (map-set stake-pool-map { stake-id: stake-id }
-;;         {
-;;           id: stake-id,
-;;           stake-token: (get stake-token stake-pool),
-;;           reward-token: (get reward-token stake-pool),
-;;           reward-amount: (update-precision (get reward-amount stake-pool)),
-;;           reward-per-block: (update-precision (get reward-per-block stake-pool)),
-;;           total-staked: (update-precision (get total-staked stake-pool)),
-;;           start-block: (get start-block stake-pool),
-;;           end-block: (get end-block stake-pool),
-;;           last-update-block: (get last-update-block stake-pool),
-;;           reward-per-token-staked: (update-precision (get reward-per-token-staked stake-pool)),
-;;           owner: (get owner stake-pool),
-;;           participants: (get participants stake-pool),
-;;           verified: false,
-;;         }
-;;       )
-;;     )
-;;     (ok true)
-;;   )
-;; )
-
-;; @desc move-user-records: move records
-;; (define-public (move-user-records (stake-id uint) (users (list 200 principal)))
-;;   (begin 
-;;     (try! (check-is-owner))
-;;     (let
-;;       (
-;;         (next-stake-id (get-next-stake-id))
-;;         (stake-pool (try! (contract-call? .memegoat-stake-pool-v1 get-stake-pool stake-id)))
-;;       )
-;;       (fold move users stake-id)
-;;     )
-;;     (ok true)
-;;   )
-;; )
-
-;; (define-private (move (user principal) (stake-id uint))
-;;   (let
-;;     (
-;;       (user-stake (unwrap-panic (contract-call? .memegoat-stake-pool-v1 get-user-staking-data stake-id user)))
-;;     )
-
-;;     (map-set has-stake { user-addr: user, stake-id: stake-id } true)
-;;     (map-set user-stake-map 
-;;       { user-addr: user, stake-id: stake-id } 
-;;       {
-;;         amount-staked: (update-precision (get amount-staked user-stake)), 
-;;         stake-rewards: (update-precision (get stake-rewards user-stake)),
-;;         reward-per-token-staked: (update-precision (get reward-per-token-staked user-stake))
-;;       }
-;;     )
-;;     stake-id
-;;   )
-;; )
 
 ;; PUBLIC CALLS
 
@@ -276,10 +204,10 @@
     (asserts! (<= reward-per-block (/ reward-amount (- end-block start-block))) ERR-INVALID-REWARD-PER-BLOCK)
 
     ;; transfer reward-token to vault
-    (try! (contract-call? reward-token transfer reward-amount sender .memegoat-stakepool-vault-v1 none)) 
+    (try! (contract-call? reward-token transfer reward-amount sender .memegoat-vault none)) 
 
     ;; transfer stx to treasury
-    (try! (stx-transfer? (var-get pool-fee) tx-sender .memegoat-treasury-v1))
+    (try! (stx-transfer? (var-get pool-fee) tx-sender .memegoat-treasury))
 
     ;; update new stake data  
     (map-set stake-pool-map { stake-id: next-stake-id }
@@ -340,10 +268,6 @@
 
 ;; PRIVATE CALLS
 
-(define-private (check-is-owner)
-  (ok (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-AUTHORIZED))
-)
-
 (define-private (do-stake (stake-id uint) (user-addr principal) (amount uint) (stake-token <ft-trait>))
   (begin
     (let
@@ -355,6 +279,7 @@
         (total-staked (get total-staked stake-pool))
         (participants (get participants stake-pool))
         (end-block (get end-block stake-pool))
+        (is-verified (get verified stake-pool))
         (new-reward-per-token-staked (do-calculate-reward stake-id))
         (precison-amount (to-precision amount stake-token))
         (updated-stake-pool (merge stake-pool {
@@ -365,6 +290,7 @@
         }))
       )
 
+      (asserts! is-verified ERR-POOL-NOT-VERIFIED)
       (asserts! (> amount u0) ERR-ZERO-AMOUNT)
       (asserts! (is-eq stake-token-contract (contract-of stake-token)) ERR-INVALID-TOKEN)
       (asserts! (< block-height end-block) ERR-STAKE-ENDED)
@@ -400,7 +326,7 @@
       )
 
       ;; transfer to vault
-      (try! (contract-call? stake-token transfer amount tx-sender .memegoat-stakepool-vault-v1 none)) 
+      (try! (contract-call? stake-token transfer amount tx-sender .memegoat-vault none)) 
 
       ;; update stake pool
       (map-set stake-pool-map {stake-id: stake-id} updated-stake-pool)
@@ -427,6 +353,7 @@
         }))
         (user-stake (try! (get-user-staking-data stake-id user-addr)))
         (amount-staked (get amount-staked user-stake))
+        (is-verified (get verified stake-pool))
         (updated-user-stake (merge user-stake {
           amount-staked: (- amount-staked precison-amount),
           stake-rewards: (do-calculate-user-rewards stake-id user-addr new-reward-per-token-staked),
@@ -435,12 +362,13 @@
       )
 
       ;; run checks 
+      (asserts! is-verified ERR-POOL-NOT-VERIFIED)
       (asserts! (is-eq stake-token-contract (contract-of stake-token)) ERR-INVALID-TOKEN)
       (asserts! (> precison-amount u0) ERR-ZERO-AMOUNT)
       (asserts! (<= precison-amount amount-staked) ERR-BALANCE-EXCEEDED)
 
       ;; transfer token from vault
-      (as-contract (try! (contract-call? .memegoat-stakepool-vault-v1 transfer-ft stake-token (from-precision precison-amount stake-token) user-addr)))   
+      (as-contract (try! (contract-call? .memegoat-vault transfer-ft stake-token (from-precision precison-amount stake-token) user-addr)))   
 
       ;; update records
       (map-set user-stake-map {user-addr: user-addr, stake-id: stake-id} updated-user-stake)
@@ -457,6 +385,7 @@
       (
         (stake-pool (try! (get-stake-pool stake-id)))
         (reward-token-contract (get reward-token stake-pool))
+        (is-verified (get verified stake-pool))
         (end-block (get end-block stake-pool))
         (new-reward-per-token-staked (do-calculate-reward stake-id))
         (updated-stake-pool (merge stake-pool {
@@ -473,11 +402,12 @@
       )
 
       ;; run checks 
+      (asserts! is-verified ERR-POOL-NOT-VERIFIED)
       (asserts! (is-eq reward-token-contract (contract-of reward-token)) ERR-INVALID-TOKEN)
       (asserts! (> reward-amount u0) ERR-ZERO-AMOUNT)
 
       ;; transfer token from vault
-      (as-contract (try! (contract-call? .memegoat-stakepool-vault-v1 transfer-ft reward-token reward-amount user-addr)))   
+      (as-contract (try! (contract-call? .memegoat-vault transfer-ft reward-token reward-amount user-addr)))   
 
       ;; update records
       (map-set user-stake-map {user-addr: user-addr, stake-id: stake-id} updated-user-stake)
@@ -559,7 +489,5 @@
 (define-private (to-precision (amount uint) (token <ft-trait>))
   (/ (* amount PRECISION) (pow-decimals token))
 )
-
-(define-private (update-precision (amount uint))
-  (/ (* amount PRECISION) OLD-PRECISION)
-)
+(define-public (callback (sender principal) (payload (buff 2048)))
+	(ok true))
